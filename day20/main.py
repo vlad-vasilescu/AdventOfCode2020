@@ -127,31 +127,51 @@ for i, line in enumerate(matrix):
     for j, col in enumerate(line):
         for k, tile_line in enumerate(col): final_tile[i * len(matrix[0][0]) + k] += tile_line
 
+max_dino_count = 0
+for i in range(4):
+    for j in range(3):
+        flip_tile = final_tile.copy()
+        if j == 1: flip_tile = flip_hor(final_tile.copy())
+        elif j == 2: flip_tile = flip_vert(final_tile.copy())
 
-# final_tile = rotate_cw(final_tile)
-# final_tile = flip_hor(final_tile)
-# print(*final_tile, sep='\n')
+        dino_count = 0
+        for line_id, line in enumerate(flip_tile):
+            if line_id >= len(flip_tile) - 2: break
+            for char_id, char in enumerate(line):
+                if char_id < 18: continue
+                if char == '#':
+                    second_line = flip_tile[line_id + 1][char_id - 18:char_id + 2]
+                    third_line = flip_tile[line_id + 2][char_id - 18:char_id + 2]
 
-# for i in range(4):
-#     for j in range(3):
-#         flip_tile = final_tile.copy()
-#         if j == 1: flip_tile = flip_hor(final_tile.copy())
-#         elif j == 2: flip_tile = flip_vert(final_tile.copy())
+                    second_valid = False
+                    if second_line[0] == '#' and \
+                        second_line[5] == '#' and \
+                        second_line[6] == '#' and \
+                        second_line[11] == '#' and \
+                        second_line[12] == '#' and \
+                        second_line[17] == '#' and \
+                        second_line[18] == '#' and \
+                        second_line[19] == '#': second_valid = True
 
-#         matches = 0
-#         for line in flip_tile:
-#             if re.match(r'#[.#]{4}##[.#]{4}##[.#]{4}###', line): matches += 1
-                
-#         if matches >= 1:
-#             print(i, j, matches)
-#             print(*flip_tile, sep='\n')
+                    third_valid = False
+                    if third_line[1] == '#' and \
+                        third_line[4] == '#' and \
+                        third_line[7] == '#' and \
+                        third_line[10] == '#' and \
+                        third_line[13] == '#' and \
+                        third_line[16] == '#': third_valid = True
 
+                    if second_valid and third_valid:
+                        dino_count += 1
 
-#     final_tile = rotate_cw(final_tile)
+        if dino_count > max_dino_count:
+            max_dino_count = dino_count
+            best_comb = (i, j)
+            best_rot = flip_tile.copy()
+    final_tile = rotate_cw(final_tile)
 
 count = 0
 for line in final_tile:
     count += line.count('#')
 
-for i in range(32, 64):
-    print(count - i * 15) # 6th answer worked for me
+print(count - 15 * max_dino_count)
